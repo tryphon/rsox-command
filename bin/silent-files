@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+
+require 'rsox-command'
+
+ARGV.each do |file|
+  Sox::Stats.new(file).tap do |stats|
+    begin
+      $stderr.puts "#{file} rms_level:#{stats.rms_level}dB rms_peak:#{stats.rms_peak}dB" if $DEBUG
+      puts file if stats.silent?
+    rescue => e
+      $stderr.puts "Error: #{file}, #{e}"
+    end
+  end
+end

@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+
+require 'rsox-command'
+
+file = ARGV.first
+stats = Sox::Stats.new(file)
+
+begin
+  $stderr.puts "#{file} rms_level:#{stats.rms_level}dB rms_peak:#{stats.rms_peak}dB" if $DEBUG
+
+  if stats.silent?
+    puts "silent"
+    exit 0
+  else
+    puts "not silent"
+    exit 1
+  end
+rescue => e
+  $stderr.puts "Error: #{file}, #{e}"
+  exit 2
+end

@@ -31,7 +31,7 @@ describe Sox::Command do
       sox.input "input2", :type => "ogg"
       
       sox.output "output", :type => "ogg", :compression => 8
-    end.command_line.should == "sox input1.wav --type ogg input2 --compression 8 --type ogg output"
+    end.command_line.command.should == "sox input1.wav --type ogg input2 --compression 8 --type ogg output 2>&1"
   }
 
   before(:each) do
@@ -123,49 +123,59 @@ describe Sox::Command do
     
     it "should concat sox binary path and command_arguments" do
       @command.stub!(:command_arguments).and_return("command_arguments")
-      @command.command_line.should == "sox command_arguments"
+      @command.command_line.command.should == "sox command_arguments 2>&1"
     end
     
-  end
-
-  describe "run" do
-
-    before(:each) do
-      @command.stub!(:command_line).and_return("command_line")
-    end
-    
-    it "should invoke system with command_line" do
-      @command.should_receive(:system).with(@command.command_line)
-      @command.run
-    end
-
-    it "should delete playlist" do
-      @command.playlist.should_receive(:delete)
-      @command.run
-    end
-
-    it "should return true if command line is successful" do
-      @command.stub :system => true
-      @command.run.should be_true
-    end
-
-    it "should return false if command line fails" do
-      @command.stub :system => false
-      @command.run.should be_false
-    end
-
   end
 
   describe "run!" do
 
-    it "should not raise error when run returns true" do
-      @command.stub :run => true
-      lambda { @command.run! }.should_not raise_error
+    before(:each) do
+      @command.stub!(:command_line).and_return(mock(:run => "ok"))
     end
     
-    it "should raise an error when run returns false" do
-      @command.stub :run => false
+    it "should run the command_line" do
+      @command.command_line.should_receive(:run)
+      @command.run!
+    end
+
+    it "should delete playlist" do
+      @command.playlist.should_receive(:delete)
+      @command.run!
+    end
+
+    it "should not raise error when the command line is successful" do
+      @command.command_line.stub :run => "ok"
+      lambda { @command.run! }.should_not raise_error
+    end
+
+    it "should raise an error if command line fails" do
+      @command.command_line.stub(:run).and_raise(Cocaine::ExitStatusError)
       lambda { @command.run! }.should raise_error
+    end
+
+    it "should capture sox output" do
+      @command.command_line.stub :run => "ok"
+      @command.run!
+      @command.run_output.should == "ok"
+    end
+
+    it "should return the Command instance" do
+      @command.run!.should == @command
+    end
+
+  end
+
+  describe "run" do
+
+    it "should return false when Cocaine command line fails" do
+      @command.stub(:run!).and_raise(Cocaine::CommandLineError)
+      @command.run.should be_false
+    end
+    
+    it "should return true when run! doesn't fail" do
+      @command.stub :run! => true
+      @command.run.should be_true
     end
 
   end

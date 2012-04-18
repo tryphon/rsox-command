@@ -1,4 +1,5 @@
 require 'tempfile'
+require 'cocaine'
 
 module Sox
 
@@ -27,6 +28,7 @@ module Sox
 
     attr_accessor :inputs, :effects
     attr_writer :output
+    attr_accessor :run_output
 
     def initialize(&block)
       @inputs = []
@@ -51,7 +53,7 @@ module Sox
     end
 
     def command_line
-      "sox #{command_arguments}"
+      Cocaine::CommandLine.new("sox", "#{command_arguments} 2>&1")
     end
 
     def command_arguments
@@ -81,17 +83,24 @@ module Sox
     end
 
     def run
-      Sox.logger.debug "Run #{command_line}" if Sox.logger
-
       begin
-        system command_line
-      ensure
-        playlist.delete
+        run!
+        true
+      rescue Cocaine::CommandLineError => e
+        false
       end
     end
 
     def run!
-      raise "Sox execution failed (#{command_line})" unless run
+      Sox.logger.debug "Run '#{command_line.command}'" if Sox.logger
+      
+      begin
+        self.run_output = command_line.run
+      ensure
+        playlist.delete
+      end
+
+      self
     end
 
     class Playlist
