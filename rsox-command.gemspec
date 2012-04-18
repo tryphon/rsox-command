@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.version     = "0.0.1"
   s.authors     = ["Alban Peignier"]
   s.email       = ["alban@tryphon.eu"]
-  s.homepage    = ""
+  s.homepage    = "http://projects.tryphon.eu/rsox-command"
   s.summary     = %q{Wrapper to run sox}
   s.description = %q{Ruby wrapper to run SoX, a sound command line utility}
 
