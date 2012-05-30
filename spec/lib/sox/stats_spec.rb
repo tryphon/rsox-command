@@ -3,14 +3,36 @@ require 'spec_helper'
 describe Sox::Stats do
 
   subject { Sox::Stats.new }
+
+  let(:file) { "spec/fixtures/test.ogg" }
   
   describe "#raw_output" do
     
     it "should return sox command output" do
-      subject.input("spec/fixtures/test.ogg")
+      subject.input(file)
       subject.raw_output.should == IO.read("spec/fixtures/test.stats")
     end
 
+  end
+
+  describe "cache" do
+
+    it "should return sox command output" do
+      # Fill cache
+      Sox::Stats.new(file, :use_cache => true).attributes
+
+      subject.use_cache = true
+      subject.input(file)
+
+      subject.command.should_not_receive(:run!)
+
+      subject.attributes
+    end
+
+    after(:each) do
+      FileUtils.rm_f "spec/fixtures/test.ogg.stats"
+    end
+                     
   end
 
   describe "#attributes" do
