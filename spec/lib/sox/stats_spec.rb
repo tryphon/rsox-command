@@ -73,5 +73,14 @@ describe Sox::Stats do
     end
 
   end
+
+  describe "peak_level" do
+    
+    it "should return 'Pk lev dB' found by sox" do
+      subject.stub :attributes => { 'Pk lev dB' => -3.0 }
+      subject.peak_level.should == -3.0
+    end
+
+  end
                     
 end

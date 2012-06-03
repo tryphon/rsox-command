@@ -43,7 +43,6 @@ module Sox
       end
 
       def dump(attributes)
-        puts "Save in #{cache_file}: #{attributes.inspect}"
         File.open(cache_file, "w") do |f|
           f.write YAML.dump(attributes)
         end
@@ -87,6 +86,10 @@ module Sox
 
     def rms_peak
       attributes['RMS Pk dB']
+    end
+
+    def peak_level
+      attributes['Pk lev dB']
     end
 
     def silent?
