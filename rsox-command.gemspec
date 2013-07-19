@@ -24,5 +24,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rake"
 
   s.add_runtime_dependency "activesupport", "< 4"
-  s.add_runtime_dependency "cocaine"
+  s.add_runtime_dependency "cocaine", "0.2.1"
 end
