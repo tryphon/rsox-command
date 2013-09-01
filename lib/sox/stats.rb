@@ -59,7 +59,15 @@ module Sox
       @attributes ||=
         begin
           paires = raw_values.collect do |key, _, value|
-            value = value.to_f if value =~ /^-?[0-9.]+$/
+          value = case value
+                  when /^-?[0-9.]+$/
+                    value.to_f
+                  when "-inf"
+                    -Float::INFINITY
+                  else
+                    value
+                  end
+
             [key, value]
           end
           Hash[paires]
@@ -92,8 +100,8 @@ module Sox
       attributes['Pk lev dB']
     end
 
-    def silent?
-      rms_peak < -45
+    def silent?(minimum_rms_peak = -45)
+      rms_peak < minimum_rms_peak
     end
 
   end

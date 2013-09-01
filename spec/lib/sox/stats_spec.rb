@@ -5,9 +5,9 @@ describe Sox::Stats do
   subject { Sox::Stats.new }
 
   let(:file) { "spec/fixtures/test.ogg" }
-  
+
   describe "#raw_output" do
-    
+
     it "should return sox command output" do
       subject.input(file)
       subject.raw_output.should == IO.read("spec/fixtures/test.stats")
@@ -32,11 +32,11 @@ describe Sox::Stats do
     after(:each) do
       FileUtils.rm_f "spec/fixtures/test.ogg.stats"
     end
-                     
+
   end
 
   describe "#attributes" do
-    
+
     it "should read name and first value from raw output" do
       subject.stub :raw_output => "A key in dB  -3"
       subject.attributes["A key in dB"].should == -3
@@ -66,21 +66,32 @@ describe Sox::Stats do
   end
 
   describe "rms_level" do
-    
+
     it "should return 'RMS lev dB' found by sox" do
       subject.stub :attributes => { 'RMS lev dB' => -3.0 }
       subject.rms_level.should == -3.0
     end
 
+    it "should return -INFINITY when sox reports '-inf'" do
+      subject.stub :raw_values => [[ 'RMS lev dB', '', "-inf" ]]
+      subject.rms_level.should == -Float::INFINITY
+    end
+
   end
 
+
   describe "peak_level" do
-    
+
     it "should return 'Pk lev dB' found by sox" do
       subject.stub :attributes => { 'Pk lev dB' => -3.0 }
       subject.peak_level.should == -3.0
     end
 
+    it "should return -INFINITY when sox reports '-inf'" do
+      subject.stub :raw_values => [[ 'Pk lev dB', '', "-inf" ]]
+      subject.peak_level.should == -Float::INFINITY
+    end
+
   end
-                    
+
 end
