@@ -3,7 +3,7 @@ $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = "rsox-command"
-  s.version     = "0.0.4"
+  s.version     = "0.0.5"
   s.authors     = ["Alban Peignier"]
   s.email       = ["alban@tryphon.eu"]
   s.homepage    = "http://projects.tryphon.eu/rsox-command"
